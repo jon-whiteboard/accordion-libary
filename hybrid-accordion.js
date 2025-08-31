@@ -62,6 +62,12 @@
             this.body = element.querySelector(accordion.options.bodySelector);
             this.icon = element.querySelector(accordion.options.iconSelector);
             
+            // Animation state tracking
+            this.isAnimating = false;
+            this.animationDirection = null; // 'opening' or 'closing'
+            this.lastClickTime = 0;
+            this.clickThrottle = 100; // Minimum time between clicks in ms
+            
             // Parse item-specific attributes
             this.parseAttributes();
             
@@ -112,15 +118,30 @@
 
             this.openTimeline = gsap.timeline({
                 paused: true,
+                onStart: () => {
+                    this.isAnimating = true;
+                },
                 onComplete: () => {
                     this.body.style.height = 'auto';
+                    this.isAnimating = false;
+                    this.animationDirection = null;
                     this.refreshScrollTrigger();
                 },
                 onReverseComplete: () => {
                     if (this.isSemanticHTML) {
                         this.element.removeAttribute('open');
                     }
+                    this.isAnimating = false;
+                    this.animationDirection = null;
                     this.refreshScrollTrigger();
+                },
+                onUpdate: () => {
+                    // Keep track of animation progress for potential interruptions
+                    if (this.animationDirection === 'opening') {
+                        this.isOpen = true;
+                    } else if (this.animationDirection === 'closing') {
+                        this.isOpen = false;
+                    }
                 }
             });
 
@@ -131,11 +152,51 @@
             );
         }
 
+        // Method to safely cancel any ongoing animation
+        cancelAnimation() {
+            if (this.openTimeline && this.isAnimating) {
+                this.openTimeline.kill();
+                this.isAnimating = false;
+                this.animationDirection = null;
+                
+                // Reset to a consistent state based on current isOpen
+                if (this.isOpen) {
+                    this.body.style.height = 'auto';
+                    this.body.style.overflow = '';
+                    if (this.isSemanticHTML) {
+                        this.element.setAttribute('open', '');
+                    }
+                    this.addActiveClasses();
+                } else {
+                    this.body.style.height = '0';
+                    this.body.style.overflow = 'hidden';
+                    if (this.isSemanticHTML) {
+                        this.element.removeAttribute('open');
+                    }
+                    this.removeActiveClasses();
+                }
+            }
+        }
+
 
 
         bindEvents() {
             // Handle semantic <details>/<summary> elements only
             this.header.addEventListener('click', (event) => {
+                // Prevent rapid clicking and clicks during animation
+                const currentTime = Date.now();
+                if (currentTime - this.lastClickTime < this.clickThrottle) {
+                    event.preventDefault();
+                    return;
+                }
+                
+                // If currently animating, cancel the animation and proceed with new action
+                if (this.isAnimating) {
+                    this.cancelAnimation();
+                }
+                
+                this.lastClickTime = currentTime;
+                
                 if (this.element.hasAttribute('open')) {
                     const containerAllowsClose = !!this.accordion.options.interactions.closeOnSecondClick;
                     if (!this.closeOnSecondClick || !containerAllowsClose) {
@@ -149,7 +210,7 @@
 
             // Handle toggle event for opening
             this.element.addEventListener('toggle', () => {
-                if (this.element.open) {
+                if (this.element.open && !this.isAnimating) {
                     this.handleOpen();
                 }
             });
@@ -157,7 +218,8 @@
             // Add hover support if enabled
             if (this.openOnHover || this.accordion.options.interactions.openOnHover) {
                 this.header.addEventListener('mouseenter', () => {
-                    if (!this.isOpen) {
+                    // Don't trigger hover during animation or if already processing
+                    if (!this.isOpen && !this.isAnimating) {
                         this.open();
                     }
                 });
@@ -188,6 +250,14 @@
         }
 
         toggle() {
+            // Prevent toggle during animation unless cancelling
+            if (this.isAnimating) {
+                this.cancelAnimation();
+                // Small delay to ensure animation is fully cancelled
+                setTimeout(() => this.toggle(), 10);
+                return;
+            }
+            
             if (this.isOpen) {
                 const allowClose = !!(this.closeOnSecondClick && this.accordion.options.interactions.closeOnSecondClick);
                 if (!allowClose) return;
@@ -198,12 +268,23 @@
         }
 
         open() {
+            // Don't proceed if already opening or if currently animating in the same direction
+            if (this.isAnimating && this.animationDirection === 'opening') {
+                return;
+            }
+            
+            // Cancel any ongoing animation
+            if (this.isAnimating) {
+                this.cancelAnimation();
+            }
+
             // Handle single open mode
             if (this.accordion.options.interactions.singleOpen) {
                 this.accordion.closeAllExcept(this);
             }
 
             this.isOpen = true;
+            this.animationDirection = 'opening';
             this.addActiveClasses();
             
             // Set open attribute for semantic elements
@@ -214,10 +295,11 @@
         }
 
         handleOpen() {
-            
             if (this.accordion.prefersReducedMotion && this.accordion.options.animation.respectMotionPreference) {
                 // No animation for reduced motion
                 this.body.style.height = 'auto';
+                this.isAnimating = false;
+                this.animationDirection = null;
             } else {
                 // Animate opening with GSAP
                 this.createTimelineIfNeeded();
@@ -226,6 +308,8 @@
                     this.openTimeline.play();
                 } else {
                     this.body.style.height = 'auto';
+                    this.isAnimating = false;
+                    this.animationDirection = null;
                 }
             }
 
@@ -238,7 +322,18 @@
         }
 
         close() {
+            // Don't proceed if already closing or if currently animating in the same direction
+            if (this.isAnimating && this.animationDirection === 'closing') {
+                return;
+            }
+            
+            // Cancel any ongoing animation
+            if (this.isAnimating) {
+                this.cancelAnimation();
+            }
+            
             this.isOpen = false;
+            this.animationDirection = 'closing';
             this.removeActiveClasses();
             
             if (this.accordion.prefersReducedMotion && this.accordion.options.animation.respectMotionPreference) {
@@ -248,6 +343,8 @@
                 }
                 this.body.style.height = '0';
                 this.body.style.overflow = 'hidden';
+                this.isAnimating = false;
+                this.animationDirection = null;
             } else {
                 // Animate closing with GSAP (if exists) or fallback instantly
                 if (this.openTimeline) {
@@ -258,6 +355,8 @@
                     }
                     this.body.style.height = '0';
                     this.body.style.overflow = 'hidden';
+                    this.isAnimating = false;
+                    this.animationDirection = null;
                 }
             }
         }
@@ -475,8 +574,14 @@
 
         closeAllExcept(exceptItem) {
             this.items.forEach(item => {
-                if (item !== exceptItem && item.isOpen) {
-                    item.close();
+                if (item !== exceptItem && (item.isOpen || item.isAnimating)) {
+                    // Cancel any ongoing animation first
+                    if (item.isAnimating) {
+                        item.cancelAnimation();
+                    }
+                    if (item.isOpen) {
+                        item.close();
+                    }
                 }
             });
         }
