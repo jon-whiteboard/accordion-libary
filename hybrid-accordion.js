@@ -147,10 +147,26 @@
                 }
             });
 
-            // Handle toggle event for opening
+            // Handle toggle event for both opening and closing
             this.element.addEventListener('toggle', () => {
                 if (this.element.open) {
+                    // Element was opened via native browser behavior
+                    if (!this.isOpen) {
+                        // Handle single open mode
+                        if (this.accordion.options.interactions.singleOpen) {
+                            this.accordion.closeAllExcept(this);
+                        }
+                        
+                        this.isOpen = true;
+                        this.addActiveClasses();
+                    }
                     this.handleOpen();
+                } else {
+                    // Element was closed via native browser behavior
+                    if (this.isOpen) {
+                        this.isOpen = false;
+                        this.removeActiveClasses();
+                    }
                 }
             });
 
