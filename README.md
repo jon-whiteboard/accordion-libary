@@ -13,6 +13,7 @@ A modern, accessible accordion component that combines the best features from mu
 - GSAP-powered smooth animations with lazy timeline creation
 - Automatic motion preference detection (`prefers-reduced-motion`)
 - Graceful fallbacks for reduced motion users
+- Robust animation cancellation and double-click prevention
 
 ### ⚙️ **Zero-Config, Highly Configurable**
 - Works out of the box with data attributes
@@ -435,6 +436,15 @@ if (typeof gsap === 'undefined') {
 // If content changes after initialization, heights may need recalculation
 // The accordion handles resize events automatically
 ```
+
+### User Interaction Handling
+
+The accordion includes robust handling for edge cases in user interaction:
+
+- **Double-click Prevention**: 100ms throttle prevents rapid clicking conflicts
+- **Animation Cancellation**: Ongoing animations are gracefully cancelled when interrupted
+- **State Consistency**: Accordion maintains consistent visual and functional state during interruptions
+- **Smooth Transitions**: Users can click during animations without visual glitches
 
 ## Examples
 
