@@ -490,9 +490,13 @@
         }
 
         closeAllExcept(exceptItem) {
+            // Only close siblings within the same accordion container
             this.items.forEach(item => {
                 if (item !== exceptItem && item.isOpen) {
-                    item.close();
+                    // Check if items are siblings (same parent accordion container)
+                    if (item.element.parentElement === exceptItem.element.parentElement) {
+                        item.close();
+                    }
                 }
             });
         }
