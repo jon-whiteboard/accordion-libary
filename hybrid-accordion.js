@@ -471,8 +471,12 @@
         // ID management is not required for semantic-only implementation
 
         initialize() {
-            const items = this.element.querySelectorAll(this.options.itemSelector);
-            this.items = Array.from(items).map(item => new AccordionItem(item, this));
+            const allItems = this.element.querySelectorAll(this.options.itemSelector);
+            const scopedItems = Array.from(allItems).filter((item) => {
+                const nearestContainer = item.closest(this.options.containerSelector);
+                return nearestContainer === this.element;
+            });
+            this.items = scopedItems.map(item => new AccordionItem(item, this));
             
             // Handle resize events
             window.addEventListener('resize', () => {
