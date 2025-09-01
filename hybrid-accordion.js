@@ -267,6 +267,15 @@
             } else {
                 // Animate closing with GSAP (if exists) or fallback instantly
                 if (this.openTimeline) {
+                    // Recalculate the current content height before closing
+                    const currentHeight = this.body.scrollHeight;
+                    
+                    // If the content height has changed since timeline creation, invalidate and recreate
+                    if (this.body.style.height === 'auto') {
+                        gsap.set(this.body, { height: currentHeight });
+                    }
+                    
+                    this.openTimeline.invalidate();
                     this.openTimeline.reverse();
                 } else {
                     if (this.isSemanticHTML) {
@@ -481,8 +490,15 @@
             // Handle resize events
             window.addEventListener('resize', () => {
                 this.items.forEach(item => {
-                    if (item.isOpen && item.body.style.height !== 'auto') {
-                        item.body.style.height = 'auto';
+                    if (item.isOpen) {
+                        // Reset height to auto to accommodate content changes
+                        if (item.body.style.height !== 'auto') {
+                            item.body.style.height = 'auto';
+                        }
+                        // Clear any cached timeline since content dimensions may have changed
+                        if (item.openTimeline) {
+                            item.openTimeline.invalidate();
+                        }
                     }
                 });
             });
