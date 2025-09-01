@@ -119,7 +119,7 @@ Configure the entire accordion via data attributes on the container:
 | `data-accordion-animation-duration` | number | `0.4` | Animation duration in seconds |
 | `data-accordion-animation-ease` | string | `"power2.inOut"` | GSAP easing function |
 | `data-accordion-animation-respect-motion-preference` | boolean | `true` | Respect user's motion preferences |
-| `data-accordion-schema-enabled` | boolean | `true` | Generate Schema.org FAQ markup |
+| `data-accordion-schema-enabled` | boolean | `false` | Generate Schema.org FAQ markup |
 | `data-accordion-scroll-to-view-enabled` | boolean | `false` | Scroll to item when opened |
 | `data-accordion-scroll-to-view-offset` | number | `100` | Scroll offset in pixels |
 | `data-accordion-scroll-to-view-delay` | number | `200` | Delay before scrolling (ms) |
@@ -197,7 +197,7 @@ const options = {
   
   // Schema.org FAQ markup
   schema: {
-    enabled: true
+    enabled: false
   },
   
   // Scroll behavior

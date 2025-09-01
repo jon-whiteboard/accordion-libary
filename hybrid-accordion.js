@@ -43,7 +43,7 @@
         },
 
         schema: {
-            enabled: true
+            enabled: false
         },
         scrollToView: {
             enabled: false,
