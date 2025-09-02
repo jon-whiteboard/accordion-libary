@@ -42,11 +42,6 @@ A modern, accessible accordion component that combines the best features from mu
 <!-- GSAP (required) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
-<!-- Optional: ScrollTrigger for layout refresh -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-
-<!-- Hybrid Accordion -->
-<script src="hybrid-accordion.js"></script>
 ```
 
 ### 2. Basic HTML Structure
@@ -276,19 +271,6 @@ Automatically scroll to opened items using browser-native anchor links:
      data-accordion-scroll-to-view-delay="150">
   <!-- items will scroll into view when opened via anchor links -->
 </div>
-```
-
-**Enable smooth scrolling** by adding this CSS:
-```css
-html {
-  scroll-behavior: smooth;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-}
 ```
 
 ## Styling

@@ -310,6 +310,28 @@
         }
 
         generateUniqueId() {
+            // If element already has an ID, validate it's unique and return it
+            if (this.element.id) {
+                const existingId = this.element.id;
+                // Check if the existing ID is actually unique in the document
+                const elementsWithSameId = document.querySelectorAll(`#${CSS.escape(existingId)}`);
+                if (elementsWithSameId.length === 1) {
+                    // ID is unique, use it
+                    return existingId;
+                }
+                // If not unique, we'll generate a new one based on the existing ID
+                let baseId = existingId;
+                let counter = 1;
+                let uniqueId = `${baseId}-${counter}`;
+                
+                while (document.getElementById(uniqueId)) {
+                    counter++;
+                    uniqueId = `${baseId}-${counter}`;
+                }
+                
+                return uniqueId;
+            }
+
             // Generate ID from header text content if available
             const headerText = this.header ? this.header.textContent.trim() : '';
             let baseId = 'accordion-item';
