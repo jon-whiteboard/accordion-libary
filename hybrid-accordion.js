@@ -47,10 +47,7 @@
         },
         scrollToView: {
             enabled: false,
-            offset: 100,
-            delay: 200,
-            duration: 800,
-            behavior: 'smooth'
+            delay: 100  // Additional delay after animation completion (ms)
         }
     };
 
@@ -245,11 +242,13 @@
                 }
             }
 
-            // Scroll to view if enabled
+            // Scroll to view if enabled - using anchor link approach
             if (this.accordion.options.scrollToView.enabled && !this.accordion.isInitialLoad) {
+                // Use animation duration as delay to ensure animations complete before scrolling
+                const scrollDelay = this.getScrollDelay();
                 setTimeout(() => {
-                    this.scrollIntoView();
-                }, this.accordion.options.scrollToView.delay);
+                    this.scrollToAnchor();
+                }, scrollDelay);
             }
         }
 
@@ -287,36 +286,59 @@
             }
         }
 
-        scrollIntoView() {
-            const { offset, duration, behavior } = this.accordion.options.scrollToView;
-            const elementPosition = this.element.getBoundingClientRect().top;
-            const offsetPosition = elementPosition + window.pageYOffset - offset;
-            
-            if (duration && duration !== 'smooth') {
-                const start = window.pageYOffset;
-                const distance = offsetPosition - start;
-                const startTime = performance.now();
-                
-                function animate(currentTime) {
-                    const elapsed = currentTime - startTime;
-                    const progress = Math.min(elapsed / duration, 1);
-                    
-                    const ease = t => 1 - Math.pow(1 - t, 3);
-                    
-                    window.scrollTo(0, start + (distance * ease(progress)));
-                    
-                    if (progress < 1) {
-                        requestAnimationFrame(animate);
-                    }
-                }
-                
-                requestAnimationFrame(animate);
-            } else {
-                window.scrollTo({
-                    top: offsetPosition,
-                    behavior: behavior || 'smooth'
-                });
+        getScrollDelay() {
+            // If reduced motion is preferred, just use the user-configured delay
+            if (this.accordion.prefersReducedMotion && this.accordion.options.animation.respectMotionPreference) {
+                return this.accordion.options.scrollToView.delay || 0;
             }
+            
+            // Animation duration (convert to ms) + user-configured post-animation delay
+            const animationDurationMs = this.accordion.options.animation.duration * 1000;
+            const postAnimationDelay = this.accordion.options.scrollToView.delay || 0;
+            
+            return animationDurationMs + postAnimationDelay;
+        }
+
+        scrollToAnchor() {
+            // Ensure the accordion item has an ID for anchor linking
+            if (!this.element.id) {
+                this.element.id = this.generateUniqueId();
+            }
+            
+            // Use browser-native anchor scrolling
+            window.location.hash = this.element.id;
+        }
+
+        generateUniqueId() {
+            // Generate ID from header text content if available
+            const headerText = this.header ? this.header.textContent.trim() : '';
+            let baseId = 'accordion-item';
+            
+            if (headerText) {
+                baseId = headerText
+                    .toLowerCase()
+                    .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
+                    .replace(/\s+/g, '-') // Replace spaces with hyphens
+                    .replace(/-+/g, '-') // Replace multiple hyphens with single
+                    .replace(/^-|-$/g, '') // Remove leading/trailing hyphens
+                    .substring(0, 50); // Limit length
+                
+                // Fallback if cleaning resulted in empty string
+                if (!baseId) {
+                    baseId = 'accordion-item';
+                }
+            }
+            
+            // Ensure uniqueness by checking existing IDs
+            let uniqueId = baseId;
+            let counter = 1;
+            
+            while (document.getElementById(uniqueId)) {
+                uniqueId = `${baseId}-${counter}`;
+                counter++;
+            }
+            
+            return uniqueId;
         }
 
         setupSchema() {
@@ -437,10 +459,7 @@
                 animationRespectMotionPreference: ['animation', 'respectMotionPreference'],
                 schemaEnabled: ['schema', 'enabled'],
                 scrollToViewEnabled: ['scrollToView', 'enabled'],
-                scrollToViewOffset: ['scrollToView', 'offset'],
-                scrollToViewDelay: ['scrollToView', 'delay'],
-                scrollToViewDuration: ['scrollToView', 'duration'],
-                scrollToViewBehavior: ['scrollToView', 'behavior']
+                scrollToViewDelay: ['scrollToView', 'delay']
             };
 
             const interactionKeys = ['singleOpen', 'startOpen', 'openOnHover', 'closeOnSecondClick'];

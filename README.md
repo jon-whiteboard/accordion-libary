@@ -22,7 +22,7 @@ A modern, accessible accordion component that combines the best features from mu
 
 ### 🔧 **Advanced Features**
 - Schema.org FAQ markup generation for SEO
-- Scroll-to-view functionality with customizable behavior
+- Scroll-to-view functionality using browser-native anchor links
 - Nested accordion support (unlimited levels)
 - Single-open or multiple-open modes
 - Hover interactions
@@ -120,10 +120,8 @@ Configure the entire accordion via data attributes on the container:
 | `data-accordion-animation-ease` | string | `"power2.inOut"` | GSAP easing function |
 | `data-accordion-animation-respect-motion-preference` | boolean | `true` | Respect user's motion preferences |
 | `data-accordion-schema-enabled` | boolean | `false` | Generate Schema.org FAQ markup |
-| `data-accordion-scroll-to-view-enabled` | boolean | `false` | Scroll to item when opened |
-| `data-accordion-scroll-to-view-offset` | number | `100` | Scroll offset in pixels |
-| `data-accordion-scroll-to-view-delay` | number | `200` | Delay before scrolling (ms) |
-| `data-accordion-scroll-to-view-duration` | number | `800` | Scroll animation duration (ms) |
+| `data-accordion-scroll-to-view-enabled` | boolean | `false` | Scroll to item when opened using anchor links |
+| `data-accordion-scroll-to-view-delay` | number | `100` | Additional delay after animation completion (ms) |
 
 ### Item-Level Attributes
 
@@ -200,13 +198,10 @@ const options = {
     enabled: false
   },
   
-  // Scroll behavior
+  // Scroll behavior - uses browser-native anchor links
   scrollToView: {
     enabled: false,
-    offset: 100,
-    delay: 200,
-    duration: 800,
-    behavior: 'smooth'
+    delay: 100  // Additional delay after animation completion (ms)
   }
 };
 ```
@@ -273,15 +268,27 @@ Automatic FAQ markup generation for search engines:
 ```
 
 ### Scroll-to-View
-Automatically scroll to opened items:
+Automatically scroll to opened items using browser-native anchor links:
 
 ```html
 <div data-accordion 
      data-accordion-scroll-to-view-enabled="true"
-     data-accordion-scroll-to-view-offset="100"
-     data-accordion-scroll-to-view-delay="200">
-  <!-- items will scroll into view when opened -->
+     data-accordion-scroll-to-view-delay="150">
+  <!-- items will scroll into view when opened via anchor links -->
 </div>
+```
+
+**Enable smooth scrolling** by adding this CSS:
+```css
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
 ```
 
 ## Styling
