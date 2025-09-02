@@ -22,6 +22,12 @@
 (function() {
     'use strict';
 
+    // Global registry for all accordion instances
+    const accordionRegistry = [];
+    
+    // Hash navigation scheduling
+    let hashNavigationScheduled = false;
+
     // Default configuration
     const defaultOptions = {
         containerSelector: '[data-accordion]',
@@ -445,6 +451,9 @@
                 element.setAttribute('itemtype', 'https://schema.org/FAQPage');
             }
             
+            // Register this accordion instance globally
+            accordionRegistry.push(this);
+            
             this.initialize();
         }
 
@@ -544,6 +553,9 @@
                 });
             });
             
+            // Schedule hash navigation check after all accordions are likely initialized
+            scheduleHashNavigation();
+            
             // Mark as initialized
             setTimeout(() => {
                 this.isInitialLoad = false;
@@ -561,6 +573,104 @@
                 }
             });
         }
+
+
+    }
+
+    // Simplified hash navigation - combines scheduling and processing
+    function scheduleHashNavigation() {
+        if (hashNavigationScheduled) return;
+        hashNavigationScheduled = true;
+        setTimeout(() => {
+            processUrlHash();
+            hashNavigationScheduled = false;
+        }, 50);
+    }
+
+    // Streamlined hash processing
+    function processUrlHash() {
+        const hash = window.location.hash;
+        if (!hash || hash.length <= 1) return;
+
+        const targetId = hash.substring(1);
+        let targetItem = findItemById(targetId);
+        
+        // Generate missing IDs if no match found
+        if (!targetItem) {
+            generateMissingIds();
+            targetItem = findItemById(targetId);
+        }
+        
+        if (targetItem) {
+            navigateToItem(targetItem);
+        }
+    }
+
+    // Consolidated item search and ID generation
+    function findItemById(targetId) {
+        for (const accordion of accordionRegistry) {
+            const item = accordion.items.find(item => item.element.id === targetId);
+            if (item) return item;
+        }
+        return null;
+    }
+
+    function generateMissingIds() {
+        accordionRegistry.forEach(accordion => {
+            accordion.items.forEach(item => {
+                if (!item.element.id) {
+                    item.element.id = item.generateUniqueId();
+                }
+            });
+        });
+    }
+
+    // Simplified navigation with ancestor support
+    function navigateToItem(targetItem) {
+        const ancestors = getAncestors(targetItem);
+        
+        // Close non-ancestor open items
+        accordionRegistry.forEach(accordion => {
+            accordion.items.forEach(item => {
+                if (item.isOpen && item !== targetItem && !ancestors.includes(item)) {
+                    item.close();
+                }
+            });
+        });
+        
+        // Open ancestors and target
+        [...ancestors, targetItem].forEach(item => {
+            if (!item.isOpen) item.open();
+        });
+        
+        // Smart scroll timing based on longest animation
+        const delay = Math.max(...accordionRegistry.map(acc => 
+            acc.prefersReducedMotion && acc.options.animation.respectMotionPreference ? 0 : acc.options.animation.duration * 1000
+        )) + 50;
+        
+        setTimeout(() => {
+            targetItem.element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, delay);
+    }
+
+    // Simplified ancestor detection
+    function getAncestors(targetItem) {
+        const ancestors = [];
+        let element = targetItem.element.parentElement;
+        
+        while (element && element !== document.body) {
+            // Check all accordions for an item matching this element
+            for (const accordion of accordionRegistry) {
+                const ancestorItem = accordion.items.find(item => item.element === element);
+                if (ancestorItem) {
+                    ancestors.unshift(ancestorItem);
+                    break;
+                }
+            }
+            element = element.parentElement;
+        }
+        
+        return ancestors;
     }
 
     // Auto-initialize accordions
@@ -571,9 +681,20 @@
 
     // Initialize when DOM is ready
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => initAccordions());
+        document.addEventListener('DOMContentLoaded', () => {
+            initAccordions();
+            setupHashChangeListener();
+        });
     } else {
         initAccordions();
+        setupHashChangeListener();
+    }
+
+    // Set up hash change listener for runtime navigation
+    function setupHashChangeListener() {
+        window.addEventListener('hashchange', () => {
+            setTimeout(processUrlHash, 10);
+        });
     }
 
     // Export for manual initialization

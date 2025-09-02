@@ -21,6 +21,7 @@ A modern, accessible accordion component that combines the best features from mu
 - Extensive customization via data attributes or options object
 
 ### 🔧 **Advanced Features**
+- **URL Hash Navigation**: Automatic navigation to accordion items via URL hash
 - Schema.org FAQ markup generation for SEO
 - Scroll-to-view functionality using browser-native anchor links
 - Nested accordion support (unlimited levels)
@@ -273,6 +274,53 @@ Automatically scroll to opened items using browser-native anchor links:
 </div>
 ```
 
+### URL Hash Navigation
+Automatically navigate to accordion items via URL hash on page load and hash changes:
+
+```html
+<!-- Manual IDs - for predictable URLs -->
+<div data-accordion>
+  <details data-accordion-item id="pricing-faq">
+    <summary data-accordion-header">Pricing Questions</summary>
+    <div data-accordion-body">
+      <p>Pricing details...</p>
+    </div>
+  </details>
+  
+  <details data-accordion-item id="technical-support">
+    <summary data-accordion-header">Technical Support</summary>
+    <div data-accordion-body">
+      <p>Support information...</p>
+    </div>
+  </details>
+</div>
+
+<!-- Generated IDs - based on header text -->
+<div data-accordion>
+  <details data-accordion-item>
+    <summary data-accordion-header">How do I reset my password?</summary>
+    <!-- Auto-generates ID: "how-do-i-reset-my-password" -->
+    <div data-accordion-body">
+      <p>Password reset instructions...</p>
+    </div>
+  </details>
+</div>
+```
+
+**URL Examples:**
+- `https://example.com/faq#pricing-faq` → Opens "Pricing Questions" item
+- `https://example.com/help#how-do-i-reset-my-password` → Opens password reset item
+- Works with nested accordions (opens all ancestor items automatically)
+
+**Features:**
+- ✅ **Zero Configuration**: Works automatically with any accordion
+- ✅ **Manual or Generated IDs**: Supports both approaches
+- ✅ **Nested Support**: Opens ancestor items for nested accordions
+- ✅ **Smart State Management**: Closes items opened by default when navigating to hash target
+- ✅ **Cross-Accordion**: Works across multiple accordion instances on the same page
+- ✅ **Runtime Navigation**: Responds to hash changes after page load
+- ✅ **Animation Aware**: Waits for longest animation to complete before scrolling
+
 ## Styling
 
 ### CSS Classes Applied
@@ -523,6 +571,66 @@ The accordion includes robust handling for edge cases in user interaction:
 </div>
 ```
 
+### Deep-Linked FAQ with Hash Navigation
+```html
+<!-- URL: https://example.com/support#billing-issues -->
+<div data-accordion data-accordion-single-open="true">
+  
+  <details data-accordion-item id="getting-started">
+    <summary data-accordion-header>
+      Getting Started
+      <span data-accordion-icon>+</span>
+    </summary>
+    <div data-accordion-body>
+      <p>Welcome guide content...</p>
+    </div>
+  </details>
+  
+  <details data-accordion-item id="billing-issues">
+    <summary data-accordion-header>
+      Billing Issues
+      <span data-accordion-icon>+</span>
+    </summary>
+    <div data-accordion-body>
+      <p>This item opens automatically from the URL hash!</p>
+      
+      <!-- Nested billing topics -->
+      <div data-accordion data-accordion-single-open="false">
+        <details data-accordion-item id="payment-methods">
+          <summary data-accordion-header>Payment Methods</summary>
+          <div data-accordion-body">
+            <p>Payment options...</p>
+          </div>
+        </details>
+        
+        <details data-accordion-item id="refund-policy">
+          <summary data-accordion-header">Refund Policy</summary>
+          <div data-accordion-body">
+            <p>Refund information...</p>
+          </div>
+        </details>
+      </div>
+    </div>
+  </details>
+  
+  <details data-accordion-item>
+    <summary data-accordion-header>
+      How do I contact support?
+      <!-- Auto-generates ID: "how-do-i-contact-support" -->
+      <span data-accordion-icon">+</span>
+    </summary>
+    <div data-accordion-body">
+      <p>Contact information...</p>
+    </div>
+  </details>
+</div>
+```
+
+**Hash Navigation Examples:**
+- `#billing-issues` → Opens "Billing Issues" item
+- `#payment-methods` → Opens "Billing Issues" + "Payment Methods" (nested)
+- `#how-do-i-contact-support` → Opens auto-generated ID item
+
 ## Contributing
 
 ### Development Setup
@@ -547,6 +655,13 @@ The accordion includes robust handling for edge cases in user interaction:
 MIT License - see LICENSE file for details.
 
 ## Changelog
+
+### v1.1.0
+- **New**: URL Hash Navigation - automatic navigation to accordion items via URL hash
+- **New**: Smart animation timing - scroll timing based on longest animation duration
+- **Enhancement**: Cross-accordion hash navigation support
+- **Enhancement**: Nested accordion hash navigation with ancestor opening
+- **Enhancement**: Runtime hash change detection for dynamic navigation
 
 ### v1.0.0
 - Initial release
