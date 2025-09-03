@@ -390,6 +390,25 @@
             if (this.icon) this.icon.classList.remove(activeClass);
         }
 
+        closeNestedItems() {
+            // Find all nested accordion containers within this item's body
+            const nestedContainers = this.body.querySelectorAll(this.accordion.options.containerSelector);
+            
+            nestedContainers.forEach(container => {
+                // Find the accordion instance for this container
+                const nestedAccordion = accordionRegistry.find(acc => acc.element === container);
+                
+                if (nestedAccordion) {
+                    // Close all open items in the nested accordion
+                    nestedAccordion.items.forEach(nestedItem => {
+                        if (nestedItem.isOpen) {
+                            nestedItem.close();
+                        }
+                    });
+                }
+            });
+        }
+
         // ARIA attributes and ID generation are unnecessary with semantic HTML
     }
 
