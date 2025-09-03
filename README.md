@@ -102,6 +102,8 @@ Configure the entire accordion via data attributes on the container:
 <div data-accordion
      data-accordion-single-open="true"
      data-accordion-open-first-item="true"
+     data-accordion-open-on-hover="true"
+     data-accordion-close-on-second-click="false"
      data-accordion-animation-duration="0.6"
      data-accordion-animation-ease="power2.out"
      data-accordion-schema-enabled="true"
@@ -114,6 +116,8 @@ Configure the entire accordion via data attributes on the container:
 |-----------|------|---------|-------------|
 | `data-accordion-single-open` | boolean | `true` | Only one item can be open at a time |
 | `data-accordion-open-first-item` | boolean | `false` | Automatically open the first accordion item on page load |
+| `data-accordion-open-on-hover` | boolean | `false` | Open accordion items on hover instead of click |
+| `data-accordion-close-on-second-click` | boolean | `true` | Allow closing accordion items by clicking the header again |
 | `data-accordion-animation-duration` | number | `0.4` | Animation duration in seconds |
 | `data-accordion-animation-ease` | string | `"power2.inOut"` | GSAP easing function |
 | `data-accordion-animation-respect-motion-preference` | boolean | `true` | Respect user's motion preferences |
@@ -129,9 +133,7 @@ Configure individual accordion items:
 
 ```html
 <details data-accordion-item 
-         data-accordion-start-open="true"
-         data-accordion-close-on-second-click="false"
-         data-accordion-open-on-hover="true">
+         data-accordion-start-open="true">
   <!-- item content -->
 </details>
 ```
@@ -139,8 +141,6 @@ Configure individual accordion items:
 | Attribute | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `data-accordion-start-open` | boolean | `false` | Start this item in open state |
-| `data-accordion-close-on-second-click` | boolean | `true` | Allow closing by clicking again |
-| `data-accordion-open-on-hover` | boolean | `false` | Open on hover instead of click |
 
 **Note:** Individual item settings (`data-accordion-start-open`) take precedence over container-level settings (`data-accordion-open-first-item`). If any item has `data-accordion-start-open="true"`, the `open-first-item` feature will be automatically disabled.
 

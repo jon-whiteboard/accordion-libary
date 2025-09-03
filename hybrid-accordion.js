@@ -69,8 +69,6 @@
 
         parseAttributes() {
             this.startOpen = this.element.getAttribute('data-accordion-start-open') === 'true';
-            this.closeOnSecondClick = this.element.getAttribute('data-accordion-close-on-second-click') !== 'false';
-            this.openOnHover = this.element.getAttribute('data-accordion-open-on-hover') === 'true';
         }
 
         setupAccessibility() {
@@ -120,8 +118,7 @@
             // Handle semantic <details>/<summary> elements only
             this.header.addEventListener('click', (event) => {
                 if (this.element.hasAttribute('open')) {
-                    const containerAllowsClose = !!this.accordion.options.interactions.closeOnSecondClick;
-                    if (!this.closeOnSecondClick || !containerAllowsClose) {
+                    if (!this.accordion.options.interactions.closeOnSecondClick) {
                         event.preventDefault();
                         return;
                     }
@@ -154,7 +151,7 @@
             });
 
             // Add hover support if enabled
-            if (this.openOnHover || this.accordion.options.interactions.openOnHover) {
+            if (this.accordion.options.interactions.openOnHover) {
                 this.header.addEventListener('mouseenter', () => {
                     if (!this.isOpen) {
                         this.open();
@@ -188,8 +185,7 @@
 
         toggle() {
             if (this.isOpen) {
-                const allowClose = !!(this.closeOnSecondClick && this.accordion.options.interactions.closeOnSecondClick);
-                if (!allowClose) return;
+                if (!this.accordion.options.interactions.closeOnSecondClick) return;
                 this.close();
             } else {
                 this.open();
