@@ -25,7 +25,8 @@
             startOpen: false,
             openFirstItem: false,
             openOnHover: false,
-            closeOnSecondClick: true
+            closeOnSecondClick: true,
+            closeNestedOnParentClose: false
         },
 
         schema: {
@@ -469,7 +470,7 @@
                 scrollToViewDelay: ['scrollToView', 'delay']
             };
 
-            const interactionKeys = ['singleOpen', 'startOpen', 'openFirstItem', 'openOnHover', 'closeOnSecondClick'];
+            const interactionKeys = ['singleOpen', 'startOpen', 'openFirstItem', 'openOnHover', 'closeOnSecondClick', 'closeNestedOnParentClose'];
 
             // Apply container attributes
             Object.keys(this.containerConfig).forEach(key => {

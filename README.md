@@ -104,6 +104,7 @@ Configure the entire accordion via data attributes on the container:
      data-accordion-open-first-item="true"
      data-accordion-open-on-hover="true"
      data-accordion-close-on-second-click="false"
+     data-accordion-close-nested-on-parent-close="true"
      data-accordion-animation-duration="0.6"
      data-accordion-animation-ease="power2.out"
      data-accordion-schema-enabled="true"
@@ -118,6 +119,7 @@ Configure the entire accordion via data attributes on the container:
 | `data-accordion-open-first-item` | boolean | `false` | Automatically open the first accordion item on page load |
 | `data-accordion-open-on-hover` | boolean | `false` | Open accordion items on hover instead of click |
 | `data-accordion-close-on-second-click` | boolean | `true` | Allow closing accordion items by clicking the header again |
+| `data-accordion-close-nested-on-parent-close` | boolean | `false` | Automatically close nested accordion items when parent closes |
 | `data-accordion-animation-duration` | number | `0.4` | Animation duration in seconds |
 | `data-accordion-animation-ease` | string | `"power2.inOut"` | GSAP easing function |
 | `data-accordion-animation-respect-motion-preference` | boolean | `true` | Respect user's motion preferences |
@@ -193,7 +195,8 @@ const options = {
     startOpen: false,
     openFirstItem: false,
     openOnHover: false,
-    closeOnSecondClick: true
+    closeOnSecondClick: true,
+    closeNestedOnParentClose: false
   },
   
   // Schema.org FAQ markup
