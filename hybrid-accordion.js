@@ -239,6 +239,11 @@
             this.isOpen = false;
             this.removeActiveClasses();
             
+            // Close nested items if enabled
+            if (this.accordion.options.interactions.closeNestedOnParentClose) {
+                this.closeNestedItems();
+            }
+            
             if (this.accordion.prefersReducedMotion && this.accordion.options.animation.respectMotionPreference) {
                 // No animation for reduced motion
                 if (this.isSemanticHTML) {
