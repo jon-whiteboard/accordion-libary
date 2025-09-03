@@ -1,24 +1,3 @@
-/**
- * Hybrid Accordion Component
- * 
- * Combines the best features from multiple accordion implementations:
- * - Semantic <details>/<summary> HTML structure (required)
- * - GSAP animations (lazy timelines) with motion-preference respect
- * - Configurable via data attributes or options (explicit shallow merges)
- * - Optional Schema.org FAQ markup and scroll-into-view
- * 
- * Usage (semantic only):
- * <div data-accordion>
- *   <details data-accordion-item data-accordion-start-open="true">
- *     <summary data-accordion-header>
- *       Question
- *       <span data-accordion-icon>+</span>
- *     </summary>
- *     <div data-accordion-body>Answer content</div>
- *   </details>
- * </div>
- */
-
 (function() {
     'use strict';
 
@@ -44,6 +23,7 @@
         interactions: {
             singleOpen: true,
             startOpen: false,
+            openFirstItem: false,
             openOnHover: false,
             closeOnSecondClick: true
         },
@@ -493,7 +473,7 @@
                 scrollToViewDelay: ['scrollToView', 'delay']
             };
 
-            const interactionKeys = ['singleOpen', 'startOpen', 'openOnHover', 'closeOnSecondClick'];
+            const interactionKeys = ['singleOpen', 'startOpen', 'openFirstItem', 'openOnHover', 'closeOnSecondClick'];
 
             // Apply container attributes
             Object.keys(this.containerConfig).forEach(key => {
@@ -552,6 +532,16 @@
                     }
                 });
             });
+            
+            // Open first item if option is enabled and no items are already set to start open
+            if (this.options.interactions.openFirstItem && this.items.length > 0) {
+                const hasItemsSetToStartOpen = this.items.some(item => item.startOpen);
+                if (!hasItemsSetToStartOpen) {
+                    // Open the first item
+                    this.items[0].startOpen = true;
+                    this.items[0].setInitialState();
+                }
+            }
             
             // Schedule hash navigation check after all accordions are likely initialized
             scheduleHashNavigation();

@@ -101,6 +101,7 @@ Configure the entire accordion via data attributes on the container:
 ```html
 <div data-accordion
      data-accordion-single-open="true"
+     data-accordion-open-first-item="true"
      data-accordion-animation-duration="0.6"
      data-accordion-animation-ease="power2.out"
      data-accordion-schema-enabled="true"
@@ -112,12 +113,15 @@ Configure the entire accordion via data attributes on the container:
 | Attribute | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `data-accordion-single-open` | boolean | `true` | Only one item can be open at a time |
+| `data-accordion-open-first-item` | boolean | `false` | Automatically open the first accordion item on page load |
 | `data-accordion-animation-duration` | number | `0.4` | Animation duration in seconds |
 | `data-accordion-animation-ease` | string | `"power2.inOut"` | GSAP easing function |
 | `data-accordion-animation-respect-motion-preference` | boolean | `true` | Respect user's motion preferences |
 | `data-accordion-schema-enabled` | boolean | `false` | Generate Schema.org FAQ markup |
 | `data-accordion-scroll-to-view-enabled` | boolean | `false` | Scroll to item when opened using anchor links |
 | `data-accordion-scroll-to-view-delay` | number | `100` | Additional delay after animation completion (ms) |
+
+**Note:** URL hash navigation takes priority over the `open-first-item` setting. If the page loads with a hash (e.g., `#faq-item-2`), the targeted item will open instead of the first item, even when `data-accordion-open-first-item="true"` is set.
 
 ### Item-Level Attributes
 
@@ -137,6 +141,8 @@ Configure individual accordion items:
 | `data-accordion-start-open` | boolean | `false` | Start this item in open state |
 | `data-accordion-close-on-second-click` | boolean | `true` | Allow closing by clicking again |
 | `data-accordion-open-on-hover` | boolean | `false` | Open on hover instead of click |
+
+**Note:** Individual item settings (`data-accordion-start-open`) take precedence over container-level settings (`data-accordion-open-first-item`). If any item has `data-accordion-start-open="true"`, the `open-first-item` feature will be automatically disabled.
 
 ## JavaScript API
 
@@ -185,6 +191,7 @@ const options = {
   interactions: {
     singleOpen: true,
     startOpen: false,
+    openFirstItem: false,
     openOnHover: false,
     closeOnSecondClick: true
   },
@@ -317,6 +324,7 @@ Automatically navigate to accordion items via URL hash on page load and hash cha
 - ✅ **Manual or Generated IDs**: Supports both approaches
 - ✅ **Nested Support**: Opens ancestor items for nested accordions
 - ✅ **Smart State Management**: Closes items opened by default when navigating to hash target
+- ✅ **Priority Over Auto-Open**: Hash navigation takes priority over `data-accordion-open-first-item` setting
 - ✅ **Cross-Accordion**: Works across multiple accordion instances on the same page
 - ✅ **Runtime Navigation**: Responds to hash changes after page load
 - ✅ **Animation Aware**: Waits for longest animation to complete before scrolling
