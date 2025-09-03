@@ -571,65 +571,6 @@ The accordion includes robust handling for edge cases in user interaction:
 </div>
 ```
 
-### Deep-Linked FAQ with Hash Navigation
-```html
-<!-- URL: https://example.com/support#billing-issues -->
-<div data-accordion data-accordion-single-open="true">
-  
-  <details data-accordion-item id="getting-started">
-    <summary data-accordion-header>
-      Getting Started
-      <span data-accordion-icon>+</span>
-    </summary>
-    <div data-accordion-body>
-      <p>Welcome guide content...</p>
-    </div>
-  </details>
-  
-  <details data-accordion-item id="billing-issues">
-    <summary data-accordion-header>
-      Billing Issues
-      <span data-accordion-icon>+</span>
-    </summary>
-    <div data-accordion-body>
-      <p>This item opens automatically from the URL hash!</p>
-      
-      <!-- Nested billing topics -->
-      <div data-accordion data-accordion-single-open="false">
-        <details data-accordion-item id="payment-methods">
-          <summary data-accordion-header>Payment Methods</summary>
-          <div data-accordion-body">
-            <p>Payment options...</p>
-          </div>
-        </details>
-        
-        <details data-accordion-item id="refund-policy">
-          <summary data-accordion-header">Refund Policy</summary>
-          <div data-accordion-body">
-            <p>Refund information...</p>
-          </div>
-        </details>
-      </div>
-    </div>
-  </details>
-  
-  <details data-accordion-item>
-    <summary data-accordion-header>
-      How do I contact support?
-      <!-- Auto-generates ID: "how-do-i-contact-support" -->
-      <span data-accordion-icon">+</span>
-    </summary>
-    <div data-accordion-body">
-      <p>Contact information...</p>
-    </div>
-  </details>
-</div>
-```
-
-**Hash Navigation Examples:**
-- `#billing-issues` → Opens "Billing Issues" item
-- `#payment-methods` → Opens "Billing Issues" + "Payment Methods" (nested)
-- `#how-do-i-contact-support` → Opens auto-generated ID item
 
 ## Contributing
 
