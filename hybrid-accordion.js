@@ -7,13 +7,61 @@
     // Hash navigation scheduling
     let hashNavigationScheduled = false;
 
+    // Utility functions for new schema parsing
+    function parseTimeValue(value) {
+        if (typeof value === 'number') {
+            return value / 1000; // Assume milliseconds, convert to seconds
+        }
+        
+        if (typeof value === 'string') {
+            const trimmed = value.trim();
+            
+            if (trimmed.endsWith('ms')) {
+                return parseFloat(trimmed.slice(0, -2)) / 1000;
+            }
+            
+            if (trimmed.endsWith('s')) {
+                return parseFloat(trimmed.slice(0, -1));
+            }
+            
+            // Unitless string numbers - assume milliseconds
+            const parsed = parseFloat(trimmed);
+            if (!isNaN(parsed)) {
+                return parsed / 1000;
+            }
+        }
+        
+        return 0.4; // Default fallback
+    }
+
+    function parseBooleanAttribute(element, attributeName) {
+        // Check if attribute exists (presence-only)
+        if (element.hasAttribute(attributeName)) {
+            const value = element.getAttribute(attributeName);
+            
+            // Empty attribute or no value = true (presence-only)
+            if (value === '' || value === null) {
+                return true;
+            }
+            
+            // Explicit string values
+            if (value === 'true') return true;
+            if (value === 'false') return false;
+            
+            // Presence wins over any other value
+            return true;
+        }
+        
+        return false; // Attribute not present
+    }
+
     // Default configuration
     const defaultOptions = {
-        containerSelector: '[data-accordion]',
-        itemSelector: '[data-accordion-item]', 
-        headerSelector: '[data-accordion-header]',
-        bodySelector: '[data-accordion-body]',
-        iconSelector: '[data-accordion-icon]',
+        containerSelector: '[data-acc="container"]',
+        itemSelector: '[data-acc="item"]', 
+        headerSelector: '[data-acc="header"]',
+        bodySelector: '[data-acc="panel"]',
+        iconSelector: '[data-acc="icon"]',
         activeClass: 'active',
         animation: {
             duration: 0.4,
@@ -69,7 +117,7 @@
         }
 
         parseAttributes() {
-            this.startOpen = this.element.getAttribute('data-accordion-start-open') === 'true';
+            this.startOpen = parseBooleanAttribute(this.element, 'data-acc-open');
         }
 
         setupAccessibility() {
@@ -465,51 +513,73 @@
             const attrs = this.element.attributes;
             for (let i = 0; i < attrs.length; i++) {
                 const attr = attrs[i];
-                if (attr.name.startsWith('data-accordion-')) {
-                    const key = attr.name.replace('data-accordion-', '').replace(/-([a-z])/g, (g) => g[1].toUpperCase());
-                    this.containerConfig[key] = this.parseAttributeValue(attr.value);
+                if (attr.name.startsWith('data-acc-')) {
+                    const key = attr.name.replace('data-acc-', '');
+                    
+                    // Handle different attribute types
+                    let value;
+                    if (key === 'duration' || key === 'scroll-delay') {
+                        value = parseTimeValue(attr.value);
+                    } else if (this.isBooleanAttribute(key)) {
+                        value = parseBooleanAttribute(this.element, attr.name);
+                    } else {
+                        value = attr.value; // String values like ease
+                    }
+                    
+                    this.containerConfig[key] = value;
                 }
             }
         }
 
-        parseAttributeValue(value) {
-            // Parse string values to appropriate types
-            if (value === 'true') return true;
-            if (value === 'false') return false;
-            if (!isNaN(value) && !isNaN(parseFloat(value))) return parseFloat(value);
-            return value;
+        isBooleanAttribute(key) {
+            const booleanAttributes = [
+                'single-open', 'open-first', 'open-on-hover', 
+                'close-on-second-click', 'close-nested-on-parent-close',
+                'respect-motion', 'scroll-into-view', 'schema'
+            ];
+            return booleanAttributes.includes(key);
         }
+
 
         mergeOptions(defaults, options) {
             // Start from defaults
             const merged = JSON.parse(JSON.stringify(defaults));
 
-            // Map camelCase keys from data-attributes to nested option paths
-            const nestedMap = {
-                animationDuration: ['animation', 'duration'],
-                animationEase: ['animation', 'ease'],
-                animationRespectMotionPreference: ['animation', 'respectMotionPreference'],
-                schemaEnabled: ['schema', 'enabled'],
-                scrollToViewEnabled: ['scrollToView', 'enabled'],
-                scrollToViewDelay: ['scrollToView', 'delay']
+            // Map kebab-case keys from new data-acc-* attributes to nested option paths
+            const attributeMapping = {
+                // Animation options
+                'duration': ['animation', 'duration'],
+                'ease': ['animation', 'ease'],
+                'respect-motion': ['animation', 'respectMotionPreference'],
+                
+                // Interaction options  
+                'single-open': ['interactions', 'singleOpen'],
+                'open-first': ['interactions', 'openFirstItem'],
+                'open-on-hover': ['interactions', 'openOnHover'],
+                'close-on-second-click': ['interactions', 'closeOnSecondClick'],
+                'close-nested-on-parent-close': ['interactions', 'closeNestedOnParentClose'],
+                
+                // Scroll options
+                'scroll-into-view': ['scrollToView', 'enabled'],
+                'scroll-delay': ['scrollToView', 'delay'],
+                
+                // Schema
+                'schema': ['schema', 'enabled']
             };
 
-            const interactionKeys = ['singleOpen', 'startOpen', 'openFirstItem', 'openOnHover', 'closeOnSecondClick', 'closeNestedOnParentClose'];
-
-            // Apply container attributes
+            // Apply container attributes using new mapping
             Object.keys(this.containerConfig).forEach(key => {
-                if (nestedMap[key]) {
-                    const path = nestedMap[key];
+                if (attributeMapping[key]) {
+                    const path = attributeMapping[key];
                     let current = merged;
                     for (let i = 0; i < path.length - 1; i++) {
                         if (!current[path[i]]) current[path[i]] = {};
                         current = current[path[i]];
                     }
                     current[path[path.length - 1]] = this.containerConfig[key];
-                } else if (interactionKeys.includes(key)) {
-                    merged.interactions[key] = this.containerConfig[key];
                 } else {
-                    merged[key] = this.containerConfig[key];
+                    // Unknown attribute, ignore (as per schema spec)
+                    console.warn(`Unknown data-acc-${key} attribute ignored`);
                 }
             });
 

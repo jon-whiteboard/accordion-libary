@@ -47,23 +47,23 @@ A modern, accessible accordion component that combines the best features from mu
 
 ### 2. Basic HTML Structure
 ```html
-<div data-accordion>
-  <details data-accordion-item>
-    <summary data-accordion-header>
+<div data-acc="container">
+  <details data-acc="item">
+    <summary data-acc="header">
       Your Question Here
-      <span data-accordion-icon>+</span>
+      <span data-acc="icon">+</span>
     </summary>
-    <div data-accordion-body>
+    <div data-acc="panel">
       <p>Your answer content here.</p>
     </div>
   </details>
   
-  <details data-accordion-item>
-    <summary data-accordion-header>
+  <details data-acc="item">
+    <summary data-acc="header">
       Another Question
-      <span data-accordion-icon>+</span>
+      <span data-acc="icon">+</span>
     </summary>
-    <div data-accordion-body>
+    <div data-acc="panel">
       <p>Another answer here.</p>
     </div>
   </details>
@@ -73,21 +73,21 @@ A modern, accessible accordion component that combines the best features from mu
 ### 3. Basic CSS
 ```css
 /* Essential styles for proper animation */
-[data-accordion-body] {
+[data-acc="panel"] {
   overflow: hidden;
 }
 
 /* Icon rotation example */
-[data-accordion-icon] {
+[data-acc="icon"] {
   transition: transform 0.3s ease;
 }
 
-[data-accordion-icon].active {
+[data-acc="icon"].active {
   transform: rotate(45deg); /* or 180deg */
 }
 
 /* Active state styling */
-[data-accordion-item].active [data-accordion-header] {
+[data-acc="item"].active [data-acc="header"] {
   color: #007bff;
 }
 ```
@@ -99,52 +99,57 @@ A modern, accessible accordion component that combines the best features from mu
 Configure the entire accordion via data attributes on the container:
 
 ```html
-<div data-accordion
-     data-accordion-single-open="true"
-     data-accordion-open-first-item="true"
-     data-accordion-open-on-hover="true"
-     data-accordion-close-on-second-click="false"
-     data-accordion-close-nested-on-parent-close="true"
-     data-accordion-animation-duration="0.6"
-     data-accordion-animation-ease="power2.out"
-     data-accordion-schema-enabled="true"
-     data-accordion-scroll-to-view-enabled="false">
+<div data-acc="container"
+     data-acc-single-open="true"
+     data-acc-open-first="false"
+     data-acc-open-on-hover="false"
+     data-acc-close-on-second-click="false"
+     data-acc-close-nested-on-parent-close="false"
+     data-acc-duration="600ms"
+     data-acc-ease="power2.out"
+     data-acc-schema="false"
+     data-acc-scroll-into-view="false">
   <!-- accordion items -->
 </div>
 ```
 
 | Attribute | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `data-accordion-single-open` | boolean | `true` | Only one item can be open at a time |
-| `data-accordion-open-first-item` | boolean | `false` | Automatically open the first accordion item on page load |
-| `data-accordion-open-on-hover` | boolean | `false` | Open accordion items on hover instead of click |
-| `data-accordion-close-on-second-click` | boolean | `true` | Allow closing accordion items by clicking the header again |
-| `data-accordion-close-nested-on-parent-close` | boolean | `false` | Automatically close nested accordion items when parent closes |
-| `data-accordion-animation-duration` | number | `0.4` | Animation duration in seconds |
-| `data-accordion-animation-ease` | string | `"power2.inOut"` | GSAP easing function |
-| `data-accordion-animation-respect-motion-preference` | boolean | `true` | Respect user's motion preferences |
-| `data-accordion-schema-enabled` | boolean | `false` | Generate Schema.org FAQ markup |
-| `data-accordion-scroll-to-view-enabled` | boolean | `false` | Scroll to item when opened using anchor links |
-| `data-accordion-scroll-to-view-delay` | number | `0.1` | Additional delay after animation completion (seconds) |
+| `data-acc-single-open` | boolean | `true` | Only one item can be open at a time |
+| `data-acc-open-first` | boolean | `false` | Automatically open the first accordion item on page load |
+| `data-acc-open-on-hover` | boolean | `false` | Open accordion items on hover instead of click |
+| `data-acc-close-on-second-click` | boolean | `true` | Allow closing accordion items by clicking the header again |
+| `data-acc-close-nested-on-parent-close` | boolean | `false` | Automatically close nested accordion items when parent closes |
+| `data-acc-duration` | time | `400ms` | Animation duration (`400ms`, `0.4s`, or `400`) |
+| `data-acc-ease` | string | `"power2.inOut"` | GSAP easing function |
+| `data-acc-respect-motion` | boolean | `true` | Respect user's motion preferences |
+| `data-acc-schema` | boolean | `false` | Generate Schema.org FAQ markup |
+| `data-acc-scroll-into-view` | boolean | `false` | Scroll to item when opened using anchor links |
+| `data-acc-scroll-delay` | time | `150ms` | Additional delay after animation completion |
 
-**Note:** URL hash navigation takes priority over the `open-first-item` setting. If the page loads with a hash (e.g., `#faq-item-2`), the targeted item will open instead of the first item, even when `data-accordion-open-first-item="true"` is set.
+**Boolean Attributes**: Optionally, use presence-only for true (`data-acc-single-open`) or explicit values (`data-acc-single-open="false"`).
+
+**Time Values**: Accepts milliseconds (`400ms`), seconds (`0.4s`), or unitless numbers (`400` = milliseconds).
+
+**Note:** URL hash navigation takes priority over the `open-first` setting. If the page loads with a hash (e.g., `#faq-item-2`), the targeted item will open instead of the first item, even when `data-acc-open-first` is set.
+
+**Note:** `schema` doesn't play nicely when items are nested inside the accordion with `schema` enabled.
 
 ### Item-Level Attributes
 
 Configure individual accordion items:
 
 ```html
-<details data-accordion-item 
-         data-accordion-start-open="true">
+<details data-acc="item" data-acc-open>
   <!-- item content -->
 </details>
 ```
 
 | Attribute | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `data-accordion-start-open` | boolean | `false` | Start this item in open state |
+| `data-acc-open` | boolean | `false` | Start this item in open state |
 
-**Note:** Individual item settings (`data-accordion-start-open`) take precedence over container-level settings (`data-accordion-open-first-item`). If any item has `data-accordion-start-open="true"`, the `open-first-item` feature will be automatically disabled.
+**Note:** Individual item settings (`data-acc-open`) take precedence over container-level settings (`data-acc-open-first`). If any item has `data-acc-open`, the `open-first` feature will be automatically disabled.
 
 ## JavaScript API
 
@@ -175,11 +180,11 @@ const accordion = new HybridAccordion.Accordion(element, options);
 ```javascript
 const options = {
   // Selectors
-  containerSelector: '[data-accordion]',
-  itemSelector: '[data-accordion-item]',
-  headerSelector: '[data-accordion-header]',
-  bodySelector: '[data-accordion-body]',
-  iconSelector: '[data-accordion-icon]',
+  containerSelector: '[data-acc="container"]',
+  itemSelector: '[data-acc="item"]',
+  headerSelector: '[data-acc="header"]',
+  bodySelector: '[data-acc="panel"]',
+  iconSelector: '[data-acc="icon"]',
   activeClass: 'active',
   
   // Animation settings
@@ -218,24 +223,24 @@ const options = {
 Accordions can be nested to unlimited depth. Each level operates independently:
 
 ```html
-<div data-accordion data-accordion-single-open="true">
-  <details data-accordion-item>
-    <summary data-accordion-header>Parent Item</summary>
-    <div data-accordion-body>
+<div data-acc="container" data-acc-single-open>
+  <details data-acc="item">
+    <summary data-acc="header">Parent Item</summary>
+    <div data-acc="panel">
       <p>Parent content...</p>
       
       <!-- Nested accordion with different settings -->
-      <div data-accordion data-accordion-single-open="false" data-accordion-animation-duration="0.6">
-        <details data-accordion-item>
-          <summary data-accordion-header>Child Item 1</summary>
-          <div data-accordion-body>
+      <div data-acc="container" data-acc-single-open="false" data-acc-duration="0.6s">
+        <details data-acc="item">
+          <summary data-acc="header">Child Item 1</summary>
+          <div data-acc="panel">
             <p>Child content...</p>
           </div>
         </details>
         
-        <details data-accordion-item>
-          <summary data-accordion-header>Child Item 2</summary>
-          <div data-accordion-body>
+        <details data-acc="item">
+          <summary data-acc="header">Child Item 2</summary>
+          <div data-acc="panel">
             <p>More child content...</p>
           </div>
         </details>
@@ -245,24 +250,15 @@ Accordions can be nested to unlimited depth. Each level operates independently:
 </div>
 ```
 
-### Hover Interactions
-Enable hover-to-open for better user experience:
-
-```html
-<div data-accordion data-accordion-open-on-hover="true">
-  <!-- items will open on hover -->
-</div>
-```
-
 ### Schema.org SEO Support
 Automatic FAQ markup generation for search engines:
 
 ```html
 <!-- This markup is automatically generated when schema is enabled -->
-<div data-accordion itemscope itemtype="https://schema.org/FAQPage">
-  <details data-accordion-item itemscope itemtype="https://schema.org/Question">
-    <summary data-accordion-header itemprop="name">Question</summary>
-    <div data-accordion-body>
+<div data-acc="container" data-acc-schema itemscope itemtype="https://schema.org/FAQPage">
+  <details data-acc="item" itemscope itemtype="https://schema.org/Question">
+    <summary data-acc="header" itemprop="name">Question</summary>
+    <div data-acc="panel">
       <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
         <div itemprop="text">
           Answer content
@@ -277,9 +273,9 @@ Automatic FAQ markup generation for search engines:
 Automatically scroll to opened items using browser-native anchor links:
 
 ```html
-<div data-accordion 
-     data-accordion-scroll-to-view-enabled="true"
-     data-accordion-scroll-to-view-delay="0.15">
+<div data-acc="container" 
+     data-acc-scroll-into-view
+     data-acc-scroll-delay="150ms">
   <!-- items will scroll into view when opened via anchor links -->
 </div>
 ```
@@ -289,28 +285,28 @@ Automatically navigate to accordion items via URL hash on page load and hash cha
 
 ```html
 <!-- Manual IDs - for predictable URLs -->
-<div data-accordion>
-  <details data-accordion-item id="pricing-faq">
-    <summary data-accordion-header">Pricing Questions</summary>
-    <div data-accordion-body">
+<div data-acc="container">
+  <details data-acc="item" id="pricing-faq">
+    <summary data-acc="header">Pricing Questions</summary>
+    <div data-acc="panel">
       <p>Pricing details...</p>
     </div>
   </details>
   
-  <details data-accordion-item id="technical-support">
-    <summary data-accordion-header">Technical Support</summary>
-    <div data-accordion-body">
+  <details data-acc="item" id="technical-support">
+    <summary data-acc="header">Technical Support</summary>
+    <div data-acc="panel">
       <p>Support information...</p>
     </div>
   </details>
 </div>
 
 <!-- Generated IDs - based on header text -->
-<div data-accordion>
-  <details data-accordion-item>
-    <summary data-accordion-header">How do I reset my password?</summary>
+<div data-acc="container">
+  <details data-acc="item">
+    <summary data-acc="header">How do I reset my password?</summary>
     <!-- Auto-generates ID: "how-do-i-reset-my-password" -->
-    <div data-accordion-body">
+    <div data-acc="panel">
       <p>Password reset instructions...</p>
     </div>
   </details>
@@ -322,12 +318,12 @@ Automatically navigate to accordion items via URL hash on page load and hash cha
 - `https://example.com/help#how-do-i-reset-my-password` → Opens password reset item
 - Works with nested accordions (opens all ancestor items automatically)
 
-**Features:**
+**Scroll-to-View Features:**
 - ✅ **Zero Configuration**: Works automatically with any accordion
 - ✅ **Manual or Generated IDs**: Supports both approaches
 - ✅ **Nested Support**: Opens ancestor items for nested accordions
 - ✅ **Smart State Management**: Closes items opened by default when navigating to hash target
-- ✅ **Priority Over Auto-Open**: Hash navigation takes priority over `data-accordion-open-first-item` setting
+- ✅ **Priority Over Auto-Open**: Hash navigation takes priority over `data-acc-open-first` setting
 - ✅ **Cross-Accordion**: Works across multiple accordion instances on the same page
 - ✅ **Runtime Navigation**: Responds to hash changes after page load
 - ✅ **Animation Aware**: Waits for longest animation to complete before scrolling
@@ -339,64 +335,19 @@ The accordion automatically applies classes for easy styling:
 
 ```css
 /* When an accordion item is open */
-[data-accordion-item].active { }
-[data-accordion-header].active { }
-[data-accordion-icon].active { }
-
-/* Basic styling example */
-[data-accordion] {
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-[data-accordion-item] {
-  border-bottom: 1px solid #eee;
-}
-
-[data-accordion-header] {
-  padding: 1rem;
-  cursor: pointer;
-  background: #f8f9fa;
-  border: none;
-  width: 100%;
-  text-align: left;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-[data-accordion-header]:hover {
-  background: #e9ecef;
-}
-
-[data-accordion-header].active {
-  background: #007bff;
-  color: white;
-}
-
-[data-accordion-body] {
-  padding: 1rem;
-}
-
-[data-accordion-icon] {
-  transition: transform 0.3s ease;
-}
-
-[data-accordion-icon].active {
-  transform: rotate(180deg);
-}
+[data-acc="item"].active { }
+[data-acc="header"].active { }
+[data-acc="icon"].active { }
 ```
 
 ## Browser Support
 
 - **Modern Browsers**: Full support with all features
 - **Older Browsers**: Graceful degradation to native `<details>`/`<summary>` behavior
-- **No JavaScript**: Basic accordion functionality still works
+- **JavaScript Disabled**: Basic accordion functionality still works
 
 ### Requirements
 - **GSAP 3.x**: Required for animations
-- **Modern Browser**: `<details>`/`<summary>` support (IE 11+ with polyfill)
 
 ## Accessibility
 
@@ -424,9 +375,9 @@ The accordion meets WCAG 2.1 AA standards:
 - **ScrollTrigger Integration**: Automatic layout refresh
 
 ### Best Practices
-- Use `data-accordion-animation-duration` to control performance
-- Set `data-accordion-animation-respect-motion-preference="true"` for accessibility
-- Consider `data-accordion-single-open="true"` for better performance with many items
+- Use `data-acc-duration` to control performance
+- Use default `data-acc-respect-motion` for accessibility
+- Consider `data-acc-single-open` for better performance with many items
 
 ## Edge Cases & Troubleshooting
 
@@ -443,7 +394,7 @@ if (typeof gsap === 'undefined') {
 #### Icons Not Rotating
 ```css
 /* Ensure icon has transition */
-[data-accordion-icon] {
+[data-acc="icon"] {
   transition: transform 0.3s ease;
   display: inline-block; /* Required for rotation */
 }
@@ -452,9 +403,9 @@ if (typeof gsap === 'undefined') {
 #### Content Not Showing
 ```html
 <!-- Ensure proper structure -->
-<details data-accordion-item>
-  <summary data-accordion-header>Header</summary>
-  <div data-accordion-body>Content</div> <!-- Must be div, not direct content -->
+<details data-acc="item">
+  <summary data-acc="header">Header</summary>
+  <div data-acc="panel">Content</div> <!-- Must be div, not direct content -->
 </details>
 ```
 
@@ -469,7 +420,7 @@ if (typeof gsap === 'undefined') {
 #### Large Numbers of Items (50+)
 ```html
 <!-- Consider disabling animations for performance -->
-<div data-accordion data-accordion-animation-respect-motion-preference="true">
+<div data-acc="container" data-acc-respect-motion>
   <!-- Many items -->
 </div>
 ```
@@ -478,12 +429,6 @@ if (typeof gsap === 'undefined') {
 - Each nested level creates independent accordion instances
 - Consider limiting nesting depth for complexity management
 - Use different animation durations for visual hierarchy
-
-#### Dynamic Content
-```javascript
-// If content changes after initialization, heights may need recalculation
-// The accordion handles resize events automatically
-```
 
 ### User Interaction Handling
 
@@ -498,26 +443,26 @@ The accordion includes robust handling for edge cases in user interaction:
 
 ### FAQ Page
 ```html
-<div data-accordion 
-     data-accordion-single-open="true" 
-     data-accordion-schema-enabled="true">
+<div data-acc="container" 
+     data-acc-single-open 
+     data-acc-schema>
   
-  <details data-accordion-item data-accordion-start-open="true">
-    <summary data-accordion-header>
+  <details data-acc="item" data-acc-open>
+    <summary data-acc="header">
       How do I get started?
-      <span data-accordion-icon>+</span>
+      <span data-acc="icon">+</span>
     </summary>
-    <div data-accordion-body>
+    <div data-acc="panel">
       <p>Getting started is easy! Just include the script and use semantic HTML.</p>
     </div>
   </details>
   
-  <details data-accordion-item>
-    <summary data-accordion-header>
+  <details data-acc="item">
+    <summary data-acc="header">
       Is it accessible?
-      <span data-accordion-icon>+</span>
+      <span data-acc="icon">+</span>
     </summary>
-    <div data-accordion-body>
+    <div data-acc="panel">
       <p>Yes! Built with semantic HTML for maximum accessibility.</p>
     </div>
   </details>
@@ -526,17 +471,17 @@ The accordion includes robust handling for edge cases in user interaction:
 
 ### Product Feature List
 ```html
-<div data-accordion 
-     data-accordion-single-open="false" 
-     data-accordion-open-on-hover="true"
-     data-accordion-animation-duration="0.6">
+<div data-acc="container" 
+     data-acc-single-open="false" 
+     data-acc-open-on-hover
+     data-acc-duration="0.6s">
   
-  <details data-accordion-item>
-    <summary data-accordion-header>
+  <details data-acc="item">
+    <summary data-acc="header">
       Feature One
-      <span data-accordion-icon">→</span>
+      <span data-acc="icon">→</span>
     </summary>
-    <div data-accordion-body>
+    <div data-acc="panel">
       <p>Detailed feature description...</p>
     </div>
   </details>
@@ -545,18 +490,18 @@ The accordion includes robust handling for edge cases in user interaction:
 
 ### Nested Navigation
 ```html
-<div data-accordion data-accordion-single-open="true">
-  <details data-accordion-item>
-    <summary data-accordion-header>
+<div data-acc="container" data-acc-single-open>
+  <details data-acc="item">
+    <summary data-acc="header">
       Products
-      <span data-accordion-icon>▼</span>
+      <span data-acc="icon">▼</span>
     </summary>
-    <div data-accordion-body>
+    <div data-acc="panel">
       
-      <div data-accordion data-accordion-single-open="false">
-        <details data-accordion-item>
-          <summary data-accordion-header>Software</summary>
-          <div data-accordion-body>
+      <div data-acc="container" data-acc-single-open="false">
+        <details data-acc="item">
+          <summary data-acc="header">Software</summary>
+          <div data-acc="panel">
             <ul>
               <li>Web Apps</li>
               <li>Mobile Apps</li>
@@ -565,9 +510,9 @@ The accordion includes robust handling for edge cases in user interaction:
           </div>
         </details>
         
-        <details data-accordion-item>
-          <summary data-accordion-header">Hardware</summary>
-          <div data-accordion-body">
+        <details data-acc="item">
+          <summary data-acc="header">Hardware</summary>
+          <div data-acc="panel">
             <ul>
               <li>Computers</li>
               <li>Peripherals</li>
@@ -605,21 +550,3 @@ The accordion includes robust handling for edge cases in user interaction:
 ## License
 
 MIT License - see LICENSE file for details.
-
-## Changelog
-
-### v1.1.0
-- **New**: URL Hash Navigation - automatic navigation to accordion items via URL hash
-- **New**: Smart animation timing - scroll timing based on longest animation duration
-- **Enhancement**: Cross-accordion hash navigation support
-- **Enhancement**: Nested accordion hash navigation with ancestor opening
-- **Enhancement**: Runtime hash change detection for dynamic navigation
-
-### v1.0.0
-- Initial release
-- Semantic HTML structure
-- GSAP animations
-- Motion preference support
-- Schema.org integration
-- Nested accordion support
-- Comprehensive configuration options
