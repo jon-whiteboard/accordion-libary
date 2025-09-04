@@ -34,7 +34,7 @@
         },
         scrollToView: {
             enabled: false,
-            delay: 100  // Additional delay after animation completion (ms)
+            delay: 0.1  // Additional delay after animation completion (seconds)
         }
     };
 
@@ -275,16 +275,16 @@
         }
 
         getScrollDelay() {
-            // If reduced motion is preferred, just use the user-configured delay
+            // If reduced motion is preferred, just use the user-configured delay (convert to ms)
             if (this.accordion.prefersReducedMotion && this.accordion.options.animation.respectMotionPreference) {
-                return this.accordion.options.scrollToView.delay || 0;
+                return (this.accordion.options.scrollToView.delay || 0) * 1000;
             }
             
-            // Animation duration (convert to ms) + user-configured post-animation delay
+            // Animation duration (convert to ms) + user-configured post-animation delay (convert to ms)
             const animationDurationMs = this.accordion.options.animation.duration * 1000;
-            const postAnimationDelay = this.accordion.options.scrollToView.delay || 0;
+            const postAnimationDelayMs = (this.accordion.options.scrollToView.delay || 0) * 1000;
             
-            return animationDurationMs + postAnimationDelay;
+            return animationDurationMs + postAnimationDelayMs;
         }
 
         scrollToAnchor() {

@@ -125,7 +125,7 @@ Configure the entire accordion via data attributes on the container:
 | `data-accordion-animation-respect-motion-preference` | boolean | `true` | Respect user's motion preferences |
 | `data-accordion-schema-enabled` | boolean | `false` | Generate Schema.org FAQ markup |
 | `data-accordion-scroll-to-view-enabled` | boolean | `false` | Scroll to item when opened using anchor links |
-| `data-accordion-scroll-to-view-delay` | number | `100` | Additional delay after animation completion (ms) |
+| `data-accordion-scroll-to-view-delay` | number | `0.1` | Additional delay after animation completion (seconds) |
 
 **Note:** URL hash navigation takes priority over the `open-first-item` setting. If the page loads with a hash (e.g., `#faq-item-2`), the targeted item will open instead of the first item, even when `data-accordion-open-first-item="true"` is set.
 
@@ -207,7 +207,7 @@ const options = {
   // Scroll behavior - uses browser-native anchor links
   scrollToView: {
     enabled: false,
-    delay: 100  // Additional delay after animation completion (ms)
+    delay: 0.1  // Additional delay after animation completion (seconds)
   }
 };
 ```
@@ -279,7 +279,7 @@ Automatically scroll to opened items using browser-native anchor links:
 ```html
 <div data-accordion 
      data-accordion-scroll-to-view-enabled="true"
-     data-accordion-scroll-to-view-delay="150">
+     data-accordion-scroll-to-view-delay="0.15">
   <!-- items will scroll into view when opened via anchor links -->
 </div>
 ```
