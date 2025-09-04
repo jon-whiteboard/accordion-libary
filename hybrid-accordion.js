@@ -542,8 +542,14 @@
 
 
         mergeOptions(defaults, options) {
-            // Start from defaults
-            const merged = JSON.parse(JSON.stringify(defaults));
+            // Start from defaults with structured merge
+            const merged = {
+                ...defaults,
+                animation: { ...defaults.animation },
+                interactions: { ...defaults.interactions },
+                schema: { ...defaults.schema },
+                scrollToView: { ...defaults.scrollToView }
+            };
 
             // Map kebab-case keys from new data-acc-* attributes to nested option paths
             const attributeMapping = {
